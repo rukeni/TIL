@@ -6,10 +6,11 @@
 /* user code */
 function answer(score) {
   let average = 0;
-  for(let i = 0; i < score.length; i++) {
+  const length = score.length;
+  for(let i = 0; i < length; i++) {
     average += score[i]
   }
-  average = average / score.length;
+  average = average / length;
   // 코드 구현 시작 영역
 
   // …
