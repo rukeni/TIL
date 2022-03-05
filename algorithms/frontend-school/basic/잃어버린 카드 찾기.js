@@ -13,9 +13,14 @@ function answer(a, b, c) {
   num.sort((x, y) => x - y);
 
   // 먼저 d 찾기
-  let d;
-  let d1 = num[1] - num[0];
-  let d2 = num[2] - num[1];
+  let d = Math.min(num[1] - num[0], num[2] - num[1]);
+  for(let i = 0; i < num.length; i++) {
+    if(num[i] + d !== num[i+1]) {
+      number = num[i] + d;
+      break;
+    }
+  }
+
 
   return number;
 }
