@@ -4,20 +4,10 @@ const glob = require('glob');
 // markdown pattern
 const MARKDOWN_PATTERN = '**/*.md';
 
-//Find all md files within a project
-const getMarkdownFiles = () => {
-  return new Promise((resolve, reject) => {
-   glob(MARKDOWN_PATTERN, (error, files) => {
-    if (error) {
-     reject(error);
-     return;
-    }
- 
-    resolve(files.map(filePath => path.join(process.cwd(), filePath)));
-   });
-  });
-}
+//Find all md files within a project and ignore node_modules
+const files = glob.sync(MARKDOWN_PATTERN, {
+  cwd: path.resolve(__dirname, '../'),
+  ignore: 'node_modules/**'
+});
 
-getMarkdownFiles().then(files => {
-  console.log('files', files)
-})
+console.log(files);
