@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo 'Hello Gabia, woof!'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "clean" : "node clean.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "rimraf": "^3.0.2"
   },
   "devDependencies": {
+    "glob": "^8.0.1",
     "husky": "^7.0.0"
   }
 }
