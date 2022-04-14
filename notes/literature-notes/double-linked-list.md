@@ -5,7 +5,6 @@ date: "2022-04-13"
 ---
 
 # Double Linked List
-
 자매품 연결 리스트:  [[linked-list]]
 
 ## 이중 링크드 리스트의 특징
