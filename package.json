@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo 'Hello Gabia, woof!'",
     "prepare": "husky install",
-    "clean": "node clean.js"
+    "clean": "node clean.js",
+    "mv": "node dailyNoteMove.js"
   },
   "keywords": [],
   "author": "",
