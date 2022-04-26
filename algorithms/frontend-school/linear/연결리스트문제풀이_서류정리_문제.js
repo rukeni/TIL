@@ -12,18 +12,20 @@ function LinkedList() {
 LinkedList.prototype.append = function (value) {
   let node = new File(value);
   let current = this.head;
-  while (current.next !== null) {
-    
-
+  if(this.head === null) {
+    this.head === node;
+  } else {
+    while(current.next !== null) {
+      current = current.next;
+    }
+    current.next = node;
   }
 }
 
 function answer(ll) {
-  // 코드 구현 시작 영역
-
-  // …
-
-  // 코드 구현 종료 영역
+  for(let i = ll.length -1; i > 0; i--) {
+    ll.append(ll[i]);
+  }
 
   return ll;
 }
