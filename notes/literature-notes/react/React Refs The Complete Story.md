@@ -1,11 +1,17 @@
-## 들어가며
-리액트를 쓴지 4년 가까이 되어 간다. `ref`를 사용하고 있지만 아직도 명확하게 `ref`개념을 잡지 못하여 의미를 정확히 잡고 싶었다.
+# 리액트 Ref의 완벽한 스토리
+출처 : [React Refs: The Complete Story](https://dev.to/this-is-learning/react-refs-the-complete-story-16km?utm_source=pocket_mylist)
 
-오늘은 `refs`의 두가지 정의를 살펴보며 시작한다.
-* 렌더 간에 데이터를 유지할 수 있는 가변 데이터 속성
-* DOM 요소에 대한 참조
+## 들어가며
+
+> 나: 리액트를 쓴지 3년은 된것 같다. `ref`를 사용하고 있지만 아직도 명확하게 `ref`개념을 잡지 못하여 의미를 정확히 잡고 싶었다.
+
+> 오늘은 `refs`의 두가지 정의를 살펴보며 시작한다.
+
+> * 렌더 간에 데이터를 유지할 수 있는 가변 데이터 속성
+> * DOM 요소에 대한 참조
 
 ## Mutable Data Storage
+
 useState는 가장 일반적인 데이터 저장용 훅입니다. 블록에서 유일한 훅은 아닙니다. useRef는 useState와는 다르지만 둘 다 렌더 간에 데이터를 유지하는데 사용할 수 있습니다.
 
 ```tsx
@@ -18,6 +24,7 @@ ref.current = 'Hello';
 이 예제에서 `ref.current`는 첫 렌더링이 뒤에 'Hello'를 포함시킬겁니다. `useRef`에서 반환된 값은 단일 키인 `current`를 가진 객체입니다.
 
 아래 코드를 실행하면 다음과 같습니다.
+
 ```tsx
 
 const ref = React.useRef();
@@ -31,7 +38,7 @@ console.log(ref);
 // React.d.ts
 
 interface MutableRefObject {
-	current: any;
+ current: any;
 }
 
 function useRef(): MutableRefObject
@@ -44,22 +51,22 @@ function useRef(): MutableRefObject
 ```jsx
 
 function useRef(initial) {
-	const [value, setValue] = useState(initial);
-	const [ref, setRef] = useState({current: initial});
+ const [value, setValue] = useState(initial);
+ const [ref, setRef] = useState({current: initial});
 
-	useEffect(() => {
-	  setRef({
-	    get current() {
-	      return value;
-	    },
+ useEffect(() => {
+   setRef({
+     get current() {
+       return value;
+     },
 
-		set current(next) {
-		  setValue(next);
-		}
-	  })
-	}, [value]);
+  set current(next) {
+    setValue(next);
+  }
+   })
+ }, [value]);
 
-	return ref;
+ return ref;
 }
 
 ```
@@ -95,7 +102,10 @@ React.useEffect(() => {
 
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-mutable-data?ctl=1&embed=1)
+
 ## Visual Timer with Refs
+
 타이머가 상태 값을 렌더링하도록 하려면 어떻게 해야할까요?
 
 이전 예를 들어 보겠습니다. 하지만 `setInterval`내에서 `useState`를 업데이트하여 해당 상태에 숫자를 추가합니다.
@@ -125,6 +135,8 @@ return (
 
 이제 타이머가 계속 렌더링을 하면서 1 에서 2로 업데이트될 것으로 예상됩니다. 그러나, 실행 중인 앱을 보면 예상치 못한 동작이 나타납니다.
 
+> [코드샘플 실행](https://stackblitz.com/edit/react-use-ref-mutable-buggy-code?ctl=1&embed=1)
+
 이것은 클로저라서 그렇습니다. `setInterval`에 전달된 것은 오랜된 것이기 때문입니다. 이는 리액트 훅을 사용할 때 흔히 발생하는 문제입니다. `useState`의 API에는 숨겨진 솔루션이 있지만 일단 `useRef`와 변이를 이용하여 해결해 보겠습니다.
 
 `useRef`는 참조를 통과하고 해당 참조를 변환하는 것에 의존하기 때문에, 두 번째 `useRef`를 도입하고 `useState` 값과 일치하도록 모든 렌더에서 변환하면 이전 클로저로 제한을 해결할 수 있습니다.
@@ -151,6 +163,8 @@ React.useEffect(() => {
 
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-mutable-fixed-code?ctl=1&embed=1)
+
 실제 프로덕션이라면, 이렇게 해결하지 않았을 것입니다. `useState`에서 콜백을 사용할 것을 권장합니다.
 
 ```jsx
@@ -176,6 +190,7 @@ React.useEffect(() => {
 우리는 단지 참조에 대한 중요한 특성 중 하나인 mutation을 설명하기 위해 `useRef`를 사용하고 있습니다.
 
 ## DOM Element References
+
 이 아티클을 시작할 때, `ref`가 단순한 데이터 저장 방법이 아니라 `React` 내부에서 DOM 노드를 참조하는 방법이라고 언급했습니다. DOM 노드를 추적하는 가장 쉬운 방법은 요소의 참조 속성을 사용하여 `useRef` 훅에 저장하는 것입니다.
 
 ```jsx
@@ -196,6 +211,8 @@ return (
 
 이 예제에서 `useEffect`의 `console.log`를 살펴보면 현재 속성에 HTMLDivElement인스턴스가 있습니다. 다음 StackBlitz를 열고 콘솔 값을 확인하여 봅시다.
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect?ctl=1&embed=1)
+
 `elRef.current`값이 현재 `HTMLDivElement`이기 때문에 자바스크립트 API의 `Element.prototype`에 접근할 수 있습니다. 이 elRef를 사용하여 기본 HTML 노드를 스타일링 할 수 있습니다.
 
 ```jsx
@@ -212,7 +229,10 @@ return (
 
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-style?ctl=1&embed=1)
+
 ## Alternative Syntax
+
 참조 속성은 또한 함수를 받아들인다는 것을 주목할 필요가 있습니다. 이 함의에 대해서는 나중에 자세히 설명하겠지만 아래 코드는 정확하게 `ref={elRef}`와 동일하게 동작합니다.
 
 ```jsx
@@ -231,6 +251,7 @@ return (
 ```
 
 ## Component References
+
 HTML 요소는 참조를 위한 훌륭한 사용사례입니다. 그러나 하위 렌더링 프로세스의 일부인 요소에 대한 참조가 필요한 경우가 많습니다. 부모 구성 요소에서 자식 구성 요소로 `ref`을 전달하려면 어떻게 해야할까요?
 
 부모에서 자식에게 속성을 전달하여 자식 구성 요소에 참조를 전달할 수 있습니다. 아래 예를 보시죠.
@@ -255,6 +276,8 @@ const App = () => {
 }
 
 ```
+
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-style-forward-ref-wrong-kinda?ctl=1&embed=1)
 
 아마 왜 이름을 `ref`대신 `divRef`로 했는지 궁금할 겁니다. 이는 리액트의 한계 때문입니다. 프로퍼티 이름을 바꾸지 않고 `ref`로 하면 의도하지 않은 결과가 초래됩니다.
 
@@ -282,6 +305,8 @@ const App = () => {
 }
 
 ```
+
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-style-forward-ref-wrong?ctl=1&embed=1)
 
 `Container` `div`가 lightblue 배경색으로 스타일링되어 있지 않다는 것을 알게될 것입니다. 그 이유는 `elRef.current`가 HTML 요소 참조가 되지 않았기 때문입니다. 따라서 단순히 전달하는 용도로  `ref`라는 이름으로는 참조 속성 이름으로 지정할 수 없습니다.
 
@@ -313,7 +338,10 @@ const App = () => {
 
 이제 `forwardRef`를 사용하므로 상위 구성요소에 있는 `ref` 속성 이름을 사용하여 다시 한 번 `elRef`에 액세스 할 수 있습니다.
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-style-forward-ref?ctl=1&embed=1)
+
 ## Class Component References
+
 대부분 함수형 컴포넌트와 관련해서 언급했지만 클래스형 컴포넌트 `ref`를 처리하는 방법을 다루는것도 중요하다고 생각합니다. 다음 클래스 구성 요소를 사용합니다.
 
 ```jsx
@@ -345,6 +373,8 @@ const App = () => {
 }
 
 ```
+
+> [코드 샘플 실행](https://stackblitz.com/edit/react-class-ref-instance?ctl=1&embed=1)
 
 원하는 경우 `App`을 클래스 컴포넌트로 작성할 수도 있습니다.
 
@@ -408,9 +438,11 @@ class Component {
 `refs`, `state`, `props`, `context` 뿐만아니라 `render`도 보입니다.
 
 ## Custom Properties and Methods
+
 리액트 컴포넌트에 빌트인으로 들어있는(예를들면, `render`, `props`)것은 class `ref`에서 액세스할 수 있을 뿐만 아니라 해당 클래스에 첨부된 데이터에도 액세스할 수 있습니다. `container.current`는 `Container` class의 인스턴스이기 때문에 custom properties와 메서드를 추가하면 참조에서 볼 수 있습니다.
 
 그래서 다음과 같이 클래스 정의를 변경하면:
+
 ```jsx
 
 class Container extends React.Component {
@@ -449,8 +481,11 @@ function App() {
 
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-class-ref-instance-custom-props?ctl=1&embed=1)
+
 ## Unidirectional Flow(단방향 흐름)
-'universal directional flow'는 이 글에서 다루려고 하는 주제보다 더 넓은 주제이지만 위에서 설명된 패턴을 활용하지 말아야 하는 이유를 이해하는 것이 중요하다고 생각합니다. `refs`가 유용한 이유가 컨셉차원에서는 위험한 이유중 하나입니다. : 단방향 데이터 흐름을 방해합니다. 
+
+'universal directional flow'는 이 글에서 다루려고 하는 주제보다 더 넓은 주제이지만 위에서 설명된 패턴을 활용하지 말아야 하는 이유를 이해하는 것이 중요하다고 생각합니다. `refs`가 유용한 이유가 컨셉차원에서는 위험한 이유중 하나입니다. : 단방향 데이터 흐름을 방해합니다.
 
 대표적으로 리액트 앱에서는 데이터를 한 방향으로 흐르기를 원할겁니다.
 
@@ -507,6 +542,7 @@ export default function App() {
 자 우리는 따라야 할 패턴에 대해 더 좋게 이해하게 됐기 때문에 잘못된 방식을 한번 살펴봅시다.
 
 ## Breaking from Suggested Patterns(제시된 패턴을 벗어나기)
+
 'lifting state'을 역행 하는 것은 그 state를 다시 `SimpleForm`컴포넌트로 낮추는 것입니다. 그런 다음 `App`에서 해당 데이터에 액세스 하려면 `ref`속성을 사용하여 상위 데이터에서 해당 데이터에 액세스할 수 있습니다.
 
 ```jsx
@@ -565,25 +601,26 @@ export default function App() {
 ![lifecycle-image](https://res.cloudinary.com/practicaldev/image/fetch/s--xBq3OAXK--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/gp0rhmu98e3hrihb24rp.png)
 이 예에서 응용 프로그램 상태의 흐름은 다음과 같습니다.
 
-- App(그리고 children `SimpleForm`)을 렌더링한다.
-- 유저는 `SimpleForm`에 저장된 데이터를 변경한다.
-- 유저가 `onDone`액션을 시작하면 `App`에서 함수를 실행시킨다.
-- `App`의 `onDone`메서드는 `SimpleForm`데이터를 조사한다.
-- 데이터가 `App`으로 반환되면 자체 데이터가 변경되므로 `App`과 `SimpleForm`의 리렌더가 모두 시작됩니다.
+* App(그리고 children `SimpleForm`)을 렌더링한다.
+* 유저는 `SimpleForm`에 저장된 데이터를 변경한다.
+* 유저가 `onDone`액션을 시작하면 `App`에서 함수를 실행시킨다.
+* `App`의 `onDone`메서드는 `SimpleForm`데이터를 조사한다.
+* 데이터가 `App`으로 반환되면 자체 데이터가 변경되므로 `App`과 `SimpleForm`의 리렌더가 모두 시작됩니다.
 
 위의 도표와 데이터 흐름을 개요에서 볼 수 있듯이 데이터는 서로 다른 두 위치에 걸쳐 분리되어 있습니다. 따라서 이 코드를 수정하기 위해서는 멘탈모델이 혼란스러울 수 있습니다. 이 코드 샘플은 `onDone`이 `SimpleForm`안에서 상태를 변경했을 때 더 복잡해 질 수 있습니다.
 
 ![diagram](https://res.cloudinary.com/practicaldev/image/fetch/s--85u403eB--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/80egvk8se7mddkkp7v6y.png)
-- `App`(그리고 children인 `SimpleForm`)을 렌더링한다.
-- 유저는 `SimpleForm`에서 변화를 만듭니다. `state`는 콜백을 통해 `App`으로 끌어 올려집니다.
-- 유저는 `onDone`액션을 합니다. 이것은 `App`에서 함수를 시작합니다.
-- `App`의 `onDone`메서드는 이미 컴포넌트에 필요한 데이터를 포함하고 있습니다. 그래서 추가 오버헤드 로직없이 `App` 및 `SimpleForm`을 다시 렌더링하기만 하면 됩니다.
+* `App`(그리고 children인 `SimpleForm`)을 렌더링합니다.
+* 유저는 `SimpleForm`에서 변화를 만듭니다. `state`는 콜백을 통해 `App`으로 끌어 올려집니다.
+* 유저는 `onDone`액션을 합니다. 이것은 `App`에서 함수를 시작합니다.
+* `App`의 `onDone`메서드는 이미 컴포넌트에 필요한 데이터를 포함하고 있습니다. 그래서 추가 오버헤드 로직없이 `App` 및 `SimpleForm`을 다시 렌더링하기만 하면 됩니다.
 
 보시다시피, 여러 단계에서 이러한 방법들은 비슷하지만(더 작은 예제에서는 그렇지 않을수도 있지만) 단방향 흐름은 훨씬 더 합리적이고 따르기 쉽습니다.
 
 그렇기 때문에 `React` 핵심 팀은 단일 지향성을 사용하고 필요하지 않을 때 해당 패턴에서 벗어나는 것을 적절히 피할 것을 강력히 권장합니다.
 
 ## Add Data to Ref
+
 이전에 `useImperativeHandle`이라는 훅을 들어본적이 없을 겁니다. 이것이 바로 그 이유입니다. 컴포넌트로 전달된 `ref`에 메서드 및 속성을 추가할 수 있습니다. 이렇게 하면 상태를 위로 올리도록 강요하는 대신 부모 내에서 자녀의 데이터 직접 액세스할 수 있습니다. 이것은 단일 흐름을 깨트릴 수 있습니다.
 
 이제 `useImperativeHandle`을 사용하여 확장할 수 있는 구성 요소를 살펴보겠습니다.
@@ -613,6 +650,8 @@ export default function App() {
   );
 }
 ```
+
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-imperative-handle-demo-pre?ctl=1&embed=1)
 
 포함된 데모에서 볼 수 있듯이 어플리케이션이 렌더링될 때 `Container`div에 `focus`를 줄 것입니다. 이 예제에서는 일단 `useImperativeHandle`을 사용하지 않고 대신 `useEffect`의 타이밍에 의존하여 `ref`의 `current`가 이미 정의되어있습니다.
 
@@ -655,6 +694,8 @@ export default function App() {
 }
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-imperative-handle-demo-post?ctl=1&embed=1)
+
 콘솔을 보면 `focus()`가 실행되었을 때 `console.log`도 찾을 수 있습니다!
 
 `useImperativeHandle`과 `forwardRef`의 조합은 컴포넌트의 API를 최대한 자연스럽게 활용할 수있습니다.
@@ -679,9 +720,12 @@ export default function App() {
   }, [elRef])
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-imperative-handle-demo-useful?ctl=1&embed=1)
+
 `Container`요소로 포커스가 적용되면 화살표 키를 사용하여 'konami 코드'를 입력해 보십시오. 그게 끝나면 어떻게 되죠?
 
 ## React Refs in `useEffect`
+
 고백할게 있습니다. 제가 거짓말을 했어요. 악의는 없지만 이전 샘플에서 프로덕션에서 절대 사용해서는 안 되는 코드를 반복해서 사용했습니다. 왜냐하면 손을 조금 흔들지 않으면, 이런 것들을 가르치는 것이 까다로울 수 있기 때문입니다.
 
 무슨 일이 일어나고 있는 거죠?
@@ -693,7 +737,6 @@ React.useEffect(() => {
 ```
 
 > 뭐라고?
-
 
 그렇구나! `useEffect` 내부에서 `elRef.current`를 배치해서는 안됩니다(자신이 실제로 무엇을 하고 있는지 알고 있는 경우가 아니라면)
 
@@ -725,10 +768,10 @@ const App = () => {
 
 왜 `refs`가 사용될때 이것이 실행될까요? 명심해야할 두가지가 있습니다.
 
-- `refs`는 재할당보다는 객체 '변화'에 의존합니다.
-- `ref`가 변이되면 리렌더링이 시작되지 않습니다.
-- `useEffect` 배열은 리렌더링에 대해서만 체크합니다.
-- `ref`의 현재 프로퍼티 집합은 리렌더링을 시작하지 않습니다(기억하세요. 어떻게 `useRef`가 이행됐는지)
+* `refs`는 재할당보다는 객체 '변화'에 의존합니다.
+* `ref`가 변이되면 리렌더링이 시작되지 않습니다.
+* `useEffect` 배열은 리렌더링에 대해서만 체크합니다.
+* `ref`의 현재 프로퍼티 집합은 리렌더링을 시작하지 않습니다(기억하세요. 어떻게 `useRef`가 이행됐는지)
 
 이를 알고 있으므로, 다시 불쾌한 예제를 한번 살펴 보겠습니다.
 
@@ -748,6 +791,8 @@ export default function App() {
   );
 }
 ```
+
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-style?ctl=1&embed=1)
 
 이 코드는 우리가 일을 제대로 했기 때문이 아니라, 리액트의 `useEffect` 훅 타이밍 특성 덕분에 처음에 예상했던 대로 동작합니다.
 
@@ -780,6 +825,8 @@ export default function App() {
 }
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-effect-bug-effect?ctl=1&embed=1)
+
 이런! 더이상 배경이 'light blue'가 아닙니다. div의 렌더링을 지연시키기 때문에 초기 렌더에 `elRef`가 할당되지 않습니다. 그런 다음 렌더링되면 `elRef`의 `.current`속성을 변환하여 `ref`를 할당합니다. mutations가 리렌더링을 시작하지 않기 때문에(또한 `useEffect`는 렌더링 중에만 실행됨), `useEffect`는 값의 차이를 '비교'할 기회가 없으므로 부작용을 만듭니다.
 
 헷갈리나요? 괜찮아요 별거 아닙니다. 나도 처음엔 그랬어요. 운동하는 법을 배우는 사람들을 돕기 위해 일종의 플레이그라운드를 만들었어요!
@@ -805,6 +852,8 @@ export default function App() {
   }, [minus]);
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-not-updating?ctl=1&embed=1)
+
 > 콘솔을 열고 각 값을 변경할 때 어떤 console.log가 실행되는지 기록해 두십시오
 
 어떻게 이 예제를 사용할까요? 좋은 질문입니다!
@@ -816,6 +865,7 @@ export default function App() {
 결론 - useState 'add'를 두번 누릅니다. 화면에 표시되는 값은 2입니다. 그런 다음 useRef 'add'버튼을 세번 누릅니다. 화면에 표시되는 값은 0입니다. useState의 버튼을 다시 한 번 누르고 둘다 값은 다시 3입니다!
 
 ## Comments from Core Team
+
 useEffect에서 ref를 추적하는 의도하지 않은 효과 때문에 핵심 팀은 이를 피하는 것을 명시적으로 제안했습니다.
 
 [댄 아브라모프의 발언](https://github.com/facebook/react/issues/14387#issuecomment-503616820)
@@ -826,15 +876,14 @@ useEffect에서 ref를 추적하는 의도하지 않은 효과 때문에 핵심 
 
 > ref.current를 의존성으로 넣으려고 할때는 대개 콜백 ref를 원합니다.
 
-
 [트위터에서 다시](https://twitter.com/dan_abramov/status/1093497348913803265)
 
 > 내 생각에 당신은 그것에 대한 콜백 ref를 원하는 것 같습니다. ref가 깊숙이 들어가 소유자 컴포넌트의 독립적인 라이프 사이클을 가질 수 있기 때문에 컴포넌트가 마법처럼 ref 변경 사항에 대응하도록 할 수는 없습니다.
 
-
 아주 좋은 부분입니다. 하지만 댄이 말한 callback ref란 무엇인가요?
 
 ## Callback Refs
+
 이 기사를 시작할 때, 우리는 ref를 할당하는 다른 방법을 언급했었습니다.
 
 ```jsx
@@ -870,6 +919,8 @@ ref가 콜백 기능을 받아들일 수 있기 때문입니다. 이러한 함�
   );
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-callback-styling?ctl=1&embed=1)
+
 > 하지만 이봐요 잠시만요! 렌더 타이밍 불일치가 여전히 존재하더라도 배경은 동일하게 적용됩니다! useEffect 타이밍 불일치로 인해 이전에 발생한 버그가 발생하지 않는 이유는 무엇일까요?
 
 이 예제에서는 useEffect의 사용을 완전히 제거했기 때문입니다! 콜백 함수는 ref를 사용할 수 있는 경우에만 실행되기 때문에, .current가 존재하는 것을 확실히 알 수 있고 그로 인해 속성 값과 해당 콜백 내부에 더 많은 것을 할당할 수 있습니다.
@@ -895,7 +946,10 @@ ref가 콜백 기능을 받아들일 수 있기 때문입니다. 이러한 함�
   }, [elRef, shouldRender]);
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-callback-and-effect?ctl=1&embed=1)
+
 ## `useState` Refs
+
 때때로 `useRef`와 콜백 ref의 조합이 충분하지 않을 수 있습니다. .current에서 새 값을 얻을 때마다 다시 렌더링해야 하는 드문 경우가 있습니다. 문제는 .current의 고유한 특성이 리렌더링을 방지한다는 것입니다. 어떻게 하면 좋을 까요? useRef를 useState로 전환하여 .current를 완전히 제거합니다.
 
 콜백 참조를 사용하여 useState 훅에 할당할 수 있습니다.
@@ -916,6 +970,8 @@ ref가 콜백 기능을 받아들일 수 있기 때문입니다. 이러한 함�
   }, [elRef])
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-callback-and-use-state?ctl=1&embed=1)
+
 자 ref 업데이트로 인해 리렌더링이 발생하므로 안전하게 ref를 useEffect의 종속성 배열로 사용할 수 있습니다.
 
 ```jsx
@@ -933,7 +989,10 @@ ref가 콜백 기능을 받아들일 수 있기 때문입니다. 이러한 함�
   }, [elNode])
 ```
 
+> [코드 샘플 실행](https://stackblitz.com/edit/react-use-ref-callback-and-state-effect?ctl=1&embed=1)
+
 그러나, 이는 성능 비용을 상쇄하는 결과를 낳습니다. 리렌더링을 하기때문에 리렌더링을 하지 않았을 때보다 본질적으로 더 느려집니다. 그러나 여기에는 유효한 용도가 있습니다. 독자는 단지 결정과 코드의 사용법만 주의하면 됩니다.
 
 ## Conclusion
+
 대부분의 엔지니어링과 마찬가지로 API의 한계, 장점 및 해결 방법을 알면 성능이 향상되고 프로덕션에서 버그가 줄어들며, 코드 구성을 보다 쉽게 사용할 수 있습니다. 이제 ref로 둘러싼 모든 이야기를 알았으니, 당신은 그 지식을 가지고 무엇을 할 것인가요? 우리는 당신의 소식을 듣고 싶습니다! 아래에 댓글을 달거나 커뮤니티 디스코드에 참여해 주세요!
