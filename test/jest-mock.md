@@ -70,15 +70,15 @@ jest.fn(implementation)은 jest.fn().mockImplementation(implementation)의 단�
 
 jest.fn()대신 테스트 결과를 출력에 사용할 문자열을 사용하여 참조 중인 mock 함수를 표현한다.
 
-### jest.fn().mockREturnThis()
+### jest.fn().mockReturnThis()
 
 jest.fn(function() {return this})의 syntatic sugar
 
-### jest.fn().mockREturnValue(value)
+### jest.fn().mockReturnValue(value)
 
 mock 함수가 불려지면 value를 리턴한다.
 
-### jest.fn().mockREturnValueOnce(value)
+### jest.fn().mockReturnValueOnce(value)
 
 mock 함수에 대한 한 번의 호출에 대해 반환되는 값을 허락한다.
 
